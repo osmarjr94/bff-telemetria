@@ -4,6 +4,7 @@ import br.com.bfftelemetria.dto.TelemetriaResponseDTO;
 import br.com.bfftelemetria.exception.VeiculoNaoEncontradoException;
 import br.com.bfftelemetria.model.EventoTelemetria;
 import br.com.bfftelemetria.repository.TelemetriaRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
 
@@ -20,11 +21,11 @@ public class TelemetriaServiceImpl implements TelemetriaService {
     }
 
     @Override
-    @Retry(name = "telemetriaService", fallbackMethod = "fallbackStatusVeiculo")
+    @CircuitBreaker(name = "telemetriaService", fallbackMethod = "fallbackGetStatusVeiculo")
+    @Retry(name = "telemetriaService")
     public TelemetriaResponseDTO getStatusVeiculo(String placa) {
         List<EventoTelemetria> eventos = repository.buscarEventosTelemetria();
 
-        // Verifica se o veículo existe na lista (opcional, mas recomendado)
         boolean existe = eventos.stream().anyMatch(e -> e.placa().equalsIgnoreCase(placa));
         if (!existe) {
             throw new VeiculoNaoEncontradoException("Veículo não encontrado para a placa: " + placa);
@@ -36,12 +37,21 @@ public class TelemetriaServiceImpl implements TelemetriaService {
 
         String status = acimaDaVelocidade ? "ALERTA: Velocidade excedida!" : "REGULAR: Dentro da velocidade.";
 
-        // Retornando o DTO em vez da String
         return new TelemetriaResponseDTO(placa, status, LocalDateTime.now());
     }
 
     @Override
     public TelemetriaResponseDTO getStatusVeiculoByPlaca(String placa) {
         return getStatusVeiculo(placa);
+    }
+
+    // --- MÉTODO DE FALLBACK ---
+    public TelemetriaResponseDTO fallbackGetStatusVeiculo(String placa, Throwable t) {
+
+        if (t instanceof VeiculoNaoEncontradoException) {
+            throw (VeiculoNaoEncontradoException) t;
+        }
+
+        return new TelemetriaResponseDTO(placa, "INDISPONÍVEL: Serviço temporariamente fora do ar.", LocalDateTime.now());
     }
 }
