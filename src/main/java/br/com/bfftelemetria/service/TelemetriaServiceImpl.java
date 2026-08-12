@@ -4,6 +4,7 @@ import br.com.bfftelemetria.dto.TelemetriaResponseDTO;
 import br.com.bfftelemetria.exception.VeiculoNaoEncontradoException;
 import br.com.bfftelemetria.model.EventoTelemetria;
 import br.com.bfftelemetria.repository.TelemetriaRepository;
+import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class TelemetriaServiceImpl implements TelemetriaService {
     }
 
     @Override
+    @Retry(name = "telemetriaService", fallbackMethod = "fallbackStatusVeiculo")
     public TelemetriaResponseDTO getStatusVeiculo(String placa) {
         List<EventoTelemetria> eventos = repository.buscarEventosTelemetria();
 
