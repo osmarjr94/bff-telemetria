@@ -23,14 +23,14 @@ public class TelemetriaController {
             @PathVariable String placa,
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
-        if (idempotencyService.existe(idempotencyKey)) {
-            return ResponseEntity.ok(idempotencyService.recuperar(idempotencyKey));
+        if (idempotencyService.existe(idempotencyKey, placa)) {
+            return ResponseEntity.ok(idempotencyService.recuperar(idempotencyKey, placa));
         }
 
         TelemetriaResponseDTO response = service.getStatusVeiculo(placa);
 
-        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
-            idempotencyService.salvar(idempotencyKey, response);
+        if (idempotencyKey != null) {
+            idempotencyService.salvar(idempotencyKey, placa, response);
         }
 
         return ResponseEntity.ok(response);

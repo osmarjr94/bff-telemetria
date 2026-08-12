@@ -16,17 +16,16 @@ public class IdempotencyService {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(cache::clear, 10, 10, TimeUnit.MINUTES);
     }
 
-    public boolean existe(String idempotencyKey) {
-        return idempotencyKey != null && cache.containsKey(idempotencyKey);
+    public void salvar(String chave, String placa, TelemetriaResponseDTO response) {
+        // Usamos uma combinação dos dois para evitar colisão
+        cache.put(chave + "-" + placa, response);
     }
 
-    public TelemetriaResponseDTO recuperar(String idempotencyKey) {
-        return cache.get(idempotencyKey);
+    public TelemetriaResponseDTO recuperar(String chave, String placa) {
+        return cache.get(chave + "-" + placa);
     }
 
-    public void salvar(String idempotencyKey, TelemetriaResponseDTO response) {
-        if (idempotencyKey != null && !idempotencyKey.isBlank()) {
-            cache.put(idempotencyKey, response);
-        }
+    public boolean existe(String chave, String placa) {
+        return cache.containsKey(chave + "-" + placa);
     }
 }
