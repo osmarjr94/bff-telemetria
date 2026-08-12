@@ -3,8 +3,12 @@ package br.com.bfftelemetria.controller; // Ajuste o pacote se necessário
 import br.com.bfftelemetria.dto.TelemetriaResponseDTO;
 import br.com.bfftelemetria.service.IdempotencyService;
 import br.com.bfftelemetria.service.TelemetriaService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/telemetria")
@@ -35,4 +39,14 @@ public class TelemetriaController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{placa}/historico")
+    public ResponseEntity<List<TelemetriaResponseDTO>> getHistoricoPorData(
+            @PathVariable String placa,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+
+        List<TelemetriaResponseDTO> historico = service.buscarHistoricoPorPlacaEData(placa, data);
+        return ResponseEntity.ok(historico);
+    }
+
 }

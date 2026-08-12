@@ -8,6 +8,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -53,5 +54,18 @@ public class TelemetriaServiceImpl implements TelemetriaService {
         }
 
         return new TelemetriaResponseDTO(placa, "INDISPONÍVEL: Serviço temporariamente fora do ar.", LocalDateTime.now());
+    }
+
+    @Override
+    @CircuitBreaker(name = "telemetriaService", fallbackMethod = "fallbackBuscarHistorico")
+    @Retry(name = "telemetriaService")
+    public List<TelemetriaResponseDTO> buscarHistoricoPorPlacaEData(String placa, LocalDate data) {
+        // Usando o nome correto do atributo injetado: 'repository'
+        return repository.buscarPorPlacaEData(placa, data);
+    }
+
+    // Fallback opcional para o histórico caso precise
+    public List<TelemetriaResponseDTO> fallbackBuscarHistorico(String placa, LocalDate data, Throwable t) {
+        return List.of();
     }
 }

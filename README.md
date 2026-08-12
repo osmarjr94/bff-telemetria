@@ -42,6 +42,21 @@ Backend For Frontend (BFF) desenvolvido em **Java** e **Spring Boot** para orque
         "timestamp": "2026-08-12T11:42:00.000",
         "status": 404
       }
+      
+      ### 📅 Consultar Histórico por Data
+
+Retorna uma lista com os eventos de telemetria de um veículo específico filtrados por uma data de referência.
+
+* **URL:** `/api/telemetria/{placa}/historico`
+* **Método:** `GET`
+* **Parâmetro de Caminho (`Path Parameter`):**
+    * `placa` (String): Placa do veículo (Ex: `ABC1234`)
+* **Parâmetro de Consulta (`Query Parameter`):**
+    * `data` (LocalDate): Data no formato `yyyy-MM-dd` (Ex: `2026-08-12`)
+
+#### 📥 Exemplo de Requisição
+```http
+GET http://localhost:8080/api/telemetria/ABC1234/historico?data=2026-08-12
       ```
 
 ### 2. Observabilidade (Spring Boot Actuator)
