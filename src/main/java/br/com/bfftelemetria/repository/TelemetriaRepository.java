@@ -10,7 +10,6 @@ import java.util.List;
 @Repository
 public class TelemetriaRepository {
 
-    // Simulação de dados de telemetria
     public List<EventoTelemetria> buscarEventosTelemetria() {
         LocalDateTime agora = LocalDateTime.now();
 
