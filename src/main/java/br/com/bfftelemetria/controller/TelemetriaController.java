@@ -1,5 +1,6 @@
 package br.com.bfftelemetria.controller;
 
+import br.com.bfftelemetria.dto.TelemetriaResponseDTO;
 import br.com.bfftelemetria.service.TelemetriaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,8 @@ public class TelemetriaController {
     }
 
     @GetMapping("/{placa}")
-    public ResponseEntity<String> consultarStatus(@PathVariable String placa) {
-        String status = service.getStatusVeiculo(placa);
-        return ResponseEntity.ok(status);
+    public ResponseEntity<TelemetriaResponseDTO> consultarStatus(@PathVariable String placa) {
+        TelemetriaResponseDTO response = service.getStatusVeiculo(placa);
+        return ResponseEntity.ok(response);
     }
 }
